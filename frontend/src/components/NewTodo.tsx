@@ -3,7 +3,11 @@ import { JSX, useState } from "react";
 import { Todo } from "../types/Todo";
 import { useNavigate } from "react-router";
 
-function NewTodo(): JSX.Element {
+type Props = {
+  token: string;
+};
+
+function NewTodo({ token }: Props): JSX.Element {
   const navigate = useNavigate();
 
   const [todoName, setTodoName] = useState('');
@@ -17,7 +21,10 @@ function NewTodo(): JSX.Element {
     };
     await fetch('http://localhost:3000/api/v1/todos', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(newTodo),
     });
     navigate('/');

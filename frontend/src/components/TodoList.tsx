@@ -6,32 +6,46 @@ import { JSX, useEffect, useState } from "react";
 import { Todo } from "../types/Todo";
 import TodoCard from "./TodoCard";
 
-function TodoList(): JSX.Element {
+type Props = {
+  token: string;
+};
+
+function TodoList({ token }: Props): JSX.Element {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function getTodos() {
-      const res = await fetch('http://localhost:3000/api/v1/todos');
+      const res = await fetch('http://localhost:3000/api/v1/todos', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
       const data = await res.json();
       setTodos(data);
       setIsLoading(false);
     }
     getTodos();
-  }, []);
+  }, [token]);
 
   async function updateTodo(updatedTodo: Todo): Promise<void> {
     setTodos(todos => todos.map(todo => todo.id === updatedTodo.id ? updatedTodo : todo));
     await fetch(`http://localhost:3000/api/v1/todos/${updatedTodo.id}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(updatedTodo),
     });
   }
 
   async function deleteTodo(todoToDelete: Todo): Promise<void> {
     setTodos(todos => todos.filter(todo => todo.id !== todoToDelete.id));
-    await fetch(`http://localhost:3000/api/v1/todos/${todoToDelete.id}`, { method: 'DELETE' });
+    await fetch(`http://localhost:3000/api/v1/todos/${todoToDelete.id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
   }
 
   return (

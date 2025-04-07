@@ -1,13 +1,13 @@
-import * as path from "path";
-import pg, { Pool } from "pg";
-import { promises as fs } from "fs";
+import * as path from 'path';
+import pg, { Pool } from 'pg';
+import { promises as fs } from 'fs';
 import {
   Kysely,
   Migrator,
   PostgresDialect,
   FileMigrationProvider,
   Generated,
-} from "kysely";
+} from 'kysely';
 
 type Database = {
   todo: TodoTable;
@@ -18,14 +18,15 @@ type TodoTable = {
   name: string;
   description: string;
   isComplete: boolean;
+  userId: number;
 };
 
 const dialect = new PostgresDialect({
   pool: new pg.Pool({
-    database: "todosdemo",
-    host: "localhost",
-    user: "postgres",
-    password: "postgres",
+    database: 'todosdemo',
+    host: 'localhost',
+    user: 'postgres',
+    password: 'postgres',
     port: 5432,
     max: 10,
   }),
@@ -41,7 +42,7 @@ export const migrator = new Migrator({
     fs,
     path,
     // This needs to be an absolute path.
-    migrationFolder: path.join(import.meta.dirname, "migrations"),
+    migrationFolder: path.join(import.meta.dirname, 'migrations'),
   }),
 });
 
@@ -50,16 +51,16 @@ export async function migrateToLatest() {
 
   let migrationErrored = false;
   results?.forEach((it) => {
-    if (it.status === "Success") {
+    if (it.status === 'Success') {
       console.log(`migration "${it.migrationName}" was executed successfully`);
-    } else if (it.status === "Error") {
+    } else if (it.status === 'Error') {
       console.error(`failed to execute migration "${it.migrationName}"`);
       migrationErrored = true;
     }
   });
 
   if (error || migrationErrored) {
-    console.error("failed to migrate");
+    console.error('failed to migrate');
     console.error(error);
     process.exit(1);
   }
